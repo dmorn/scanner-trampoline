@@ -36,9 +36,14 @@ test "parses default configuration payload" {
 pub fn main() !void {
     // std.log.info("trim_leading: {s}, open: {s}", .{ config.trim_leading, config.open });
 
-    // var buffer: [256]u8 = undefined;
-    // while (true) {
-    //     var size = try stdin.read(&buffer);
-    //     std.debug.print("#{d} bytes were read: {s}", .{ size, buffer });
-    // }
+    std.debug.print("*** scanner trampoline is ready ***\n", .{});
+
+    var buffer: [256]u8 = undefined;
+    while (true) {
+        var size = try stdin.read(&buffer);
+        std.debug.print("#{d} bytes were read: {s}\n", .{ size, buffer });
+        var args = [_:null]?[*:0]const u8{ "yeppo", "hellop" };
+        return std.os.execvpeZ("echo", &args, &[0:null]?[*:0]const u8{});
+        // std.os.execvpeZ("echo", [_:null]?[*:0]const u8{ "hello", buffer, null });
+    }
 }
