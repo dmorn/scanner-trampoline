@@ -10,7 +10,7 @@ func Default() Config {
 	switch runtime.GOOS {
 	case "windows":
 		return Config{
-			OpenCmd: []string{"Invoke-Item"},
+			OpenCmd: []string{"powershell", "-nologo", "-noprofile", "Invoke-Item"},
 		}
 	default:
 		return Config{
@@ -20,7 +20,8 @@ func Default() Config {
 }
 
 type Config struct {
-	OpenCmd []string `toml:"open_cmd"`
+	OpenCmd     []string `toml:"open_cmd"`
+	TrimLeading string   `toml:"trim_leading"`
 }
 
 func Unmarshal(data []byte, c *Config) error {

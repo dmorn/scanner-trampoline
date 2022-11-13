@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
+	"strings"
 	"time"
 
 	"github.com/charmbracelet/bubbles/help"
@@ -126,7 +127,7 @@ func (m *model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			m.lastScan = m.input.Value()
 			m.input.Reset()
 			return m, func() tea.Msg {
-				return open(m.lastScan)
+				return m.open()
 			}
 		case key.Matches(msg, m.keys.Quit):
 			return m, tea.Quit
@@ -176,21 +177,26 @@ func (m *model) View() string {
 	return body
 }
 
+func (m *model) open() tea.Msg {
+	ctx, cancel := context.WithTimeout(context.Background(), time.Second*10)
+	defer cancel()
+
+	path := strings.TrimLeft(m.lastScan, m.config.TrimLeading)
+
+	args := append(m.config.OpenCmd, path)
+	cmd := exec.CommandContext(ctx, args[0], args[1:]...)
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		return errMsg(fmt.Errorf("%w: %v", err, out))
+	}
+
+	return errMsg(fmt.Errorf("success: %v", out))
+}
+
 type (
 	errMsg   error
 	clearMsg struct{}
 )
-
-func open(path string) tea.Msg {
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second*2)
-	defer cancel()
-
-	cmd := exec.CommandContext(ctx, "open", path)
-	if err := cmd.Run(); err != nil {
-		return errMsg(err)
-	}
-	return nil
-}
 
 func errorf(err error) {
 	fmt.Printf("%s: error: %v", os.Args[0], err)
