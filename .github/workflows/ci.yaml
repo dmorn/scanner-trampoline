@@ -16,5 +16,5 @@ jobs:
       - name: Build
         run: |
           go mod tidy -v
-          go build -v .
+          go build cmd/scanner-trampoline/main.go -o scanner-trampoline
           
