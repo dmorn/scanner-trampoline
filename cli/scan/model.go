@@ -12,6 +12,8 @@ import (
 	"github.com/dmorn/scanner-trampoline/config"
 )
 
+const maxErrLen = 80
+
 type (
 	errMsg error
 )
@@ -76,7 +78,12 @@ func (m *model) View() string {
 	header += "\n"
 	header += "***\n"
 	header += fmt.Sprintf("last scan: %s\n", m.lastScan)
-	header += fmt.Sprintf("last err: %v\n", m.err)
+
+	err := fmt.Sprintf("%v", m.err)
+	if len(err) > maxErrLen {
+		err = err[:maxErrLen]
+	}
+	header += fmt.Sprintf("last err: %s\n", err)
 
 	header += "\n"
 	header += "***\n"
